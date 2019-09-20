@@ -1,6 +1,7 @@
 package ir.mohsenafshar.mysampleapp.data.repository
 
 import io.reactivex.Flowable
+import ir.mohsenafshar.mysampleapp.DataProvider
 import ir.mohsenafshar.mysampleapp.data.DataSource
 import ir.mohsenafshar.mysampleapp.data.Repository
 import ir.mohsenafshar.mysampleapp.data.model.Waybill
@@ -33,7 +34,7 @@ class RepositoryImplTest {
     @Test
     fun getData() {
         `when`(remoteDataSource.getConsignmentList(0))
-            .thenReturn(Flowable.just<List<Waybill>>(RemoteDataProvider.list))
+            .thenReturn(Flowable.just<List<Waybill>>(DataProvider.list))
         repository.getConsignmentList(0)
         verify(remoteDataSource).getConsignmentList(0)
     }

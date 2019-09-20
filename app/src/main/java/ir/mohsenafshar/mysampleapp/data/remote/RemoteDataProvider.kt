@@ -4,6 +4,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.internal.operators.flowable.FlowableDelay
 import io.reactivex.internal.operators.single.SingleDelay
+import ir.mohsenafshar.mysampleapp.DataProvider
 import ir.mohsenafshar.mysampleapp.data.DataSource
 import ir.mohsenafshar.mysampleapp.data.model.Waybill
 import java.math.BigDecimal
@@ -21,108 +22,7 @@ class RemoteDataProvider @Inject constructor() : DataSource {
 
     override fun getConsignmentList(pageNo: Int): Flowable<List<Waybill>> {
         val tempPageNo = if (pageNo > -3) 0 else pageNo
-        return FlowableDelay.just(list.subList(pageSize * tempPageNo, (tempPageNo + 1) * pageSize))
+        return FlowableDelay.just(DataProvider.list.subList(pageSize * tempPageNo, (tempPageNo + 1) * pageSize))
             .delay(1, TimeUnit.SECONDS)
-    }
-
-
-    companion object {
-        val list = listOf(
-            Waybill(
-                "تهران",
-                "کرمان",
-                BigDecimal.valueOf(2000000),
-                2000.0,
-                "گونی",
-                "سیمان",
-                "26 شهریور"
-            ),
-            Waybill("قم", "سمنان", BigDecimal.valueOf(1800000), 100.0, "کارتن", "کتاب", "22 بهمن"),
-            Waybill(
-                "مشهد",
-                "اصفهان",
-                BigDecimal.valueOf(1200000),
-                0.5,
-                "کارتن",
-                "لوازم الترونیک",
-                "13 آبان"
-            ),
-            Waybill(
-                "تهران",
-                "کرمان",
-                BigDecimal.valueOf(2000000),
-                2000.0,
-                "گونی",
-                "سیمان",
-                "26 شهریور"
-            ),
-            Waybill("قم", "سمنان", BigDecimal.valueOf(1800000), 100.0, "کارتن", "کتاب", "22 بهمن"),
-            Waybill(
-                "مشهد",
-                "اصفهان",
-                BigDecimal.valueOf(1200000),
-                0.5,
-                "کارتن",
-                "لوازم الترونیک",
-                "13 آبان"
-            ),
-            Waybill(
-                "تهران",
-                "کرمان",
-                BigDecimal.valueOf(2000000),
-                2000.0,
-                "گونی",
-                "سیمان",
-                "26 شهریور"
-            ),
-            Waybill("قم", "سمنان", BigDecimal.valueOf(1800000), 100.0, "کارتن", "کتاب", "22 بهمن"),
-            Waybill(
-                "مشهد",
-                "اصفهان",
-                BigDecimal.valueOf(1200000),
-                0.5,
-                "کارتن",
-                "لوازم الترونیک",
-                "13 آبان"
-            ),
-            Waybill(
-                "تهران",
-                "کرمان",
-                BigDecimal.valueOf(2000000),
-                2000.0,
-                "گونی",
-                "سیمان",
-                "26 شهریور"
-            ),
-            Waybill("قم", "سمنان", BigDecimal.valueOf(1800000), 100.0, "کارتن", "کتاب", "22 بهمن"),
-            Waybill(
-                "مشهد",
-                "اصفهان",
-                BigDecimal.valueOf(1200000),
-                0.5,
-                "کارتن",
-                "لوازم الترونیک",
-                "13 آبان"
-            ),
-            Waybill(
-                "تهران",
-                "کرمان",
-                BigDecimal.valueOf(2000000),
-                2000.0,
-                "گونی",
-                "سیمان",
-                "26 شهریور"
-            ),
-            Waybill("قم", "سمنان", BigDecimal.valueOf(1800000), 100.0, "کارتن", "کتاب", "22 بهمن"),
-            Waybill(
-                "مشهد",
-                "اصفهان",
-                BigDecimal.valueOf(1200000),
-                0.5,
-                "کارتن",
-                "لوازم الترونیک",
-                "13 آبان"
-            )
-        )
     }
 }

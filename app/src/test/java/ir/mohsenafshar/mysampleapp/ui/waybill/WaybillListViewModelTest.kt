@@ -15,6 +15,7 @@ import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.Scheduler
 import io.reactivex.annotations.NonNull
+import ir.mohsenafshar.mysampleapp.DataProvider
 import ir.mohsenafshar.mysampleapp.data.model.Waybill
 import org.junit.*
 import java.util.concurrent.Executor
@@ -59,14 +60,14 @@ class WaybillListViewModelTest {
 
     @Test
     fun successLoadData() {
-        `when`(repository.getConsignmentList(0)).thenReturn(Flowable.just(RemoteDataProvider.list))
+        `when`(repository.getConsignmentList(0)).thenReturn(Flowable.just(DataProvider.list))
 
         Assert.assertEquals(viewModel.items.value, emptyList<Waybill>())
 
         viewModel.getWaybills(0)
         verify(repository).getConsignmentList(0)
 
-        Assert.assertEquals(viewModel.items.value, RemoteDataProvider.list)
+        Assert.assertEquals(viewModel.items.value, DataProvider.list)
     }
 
     @Test
