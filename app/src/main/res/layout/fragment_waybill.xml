@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+            name="vm"
+            type="ir.mohsenafshar.mysampleapp.ui.waybill.WaybillListViewModel" />
+    </data>
+
+    <FrameLayout
+        android:id="@+id/waybillListFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcWaybill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/pb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminate="true"
+            android:layout_gravity="bottom"
+            android:visibility="@{vm.dataLoading ? View.VISIBLE : View.INVISIBLE, default = invisible}"/>
+
+    </FrameLayout>
+</layout>

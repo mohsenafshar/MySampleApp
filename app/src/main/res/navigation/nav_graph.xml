@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/waybillListFragment">
+
+    <fragment
+        android:id="@+id/waybillListFragment"
+        android:name="ir.mohsenafshar.mysampleapp.ui.waybill.WaybillListFragment"
+        android:label="Task Details"
+        tools:layout="@layout/fragment_waybill">
+        <action
+            android:id="@+id/action_waybillListFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="ir.mohsenafshar.mysampleapp.ui.detail.DetailFragment"
+        android:label="DetailFragment"
+        tools:layout="@layout/fragment_detail">
+        <argument
+            android:name="waybill"
+            app:argType="ir.mohsenafshar.mysampleapp.data.model.Waybill" />
+    </fragment>
+</navigation>
