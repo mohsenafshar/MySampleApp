@@ -1,13 +1,10 @@
 package ir.mohsenafshar.mysampleapp.data.remote
 
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.internal.operators.flowable.FlowableDelay
-import io.reactivex.internal.operators.single.SingleDelay
 import ir.mohsenafshar.mysampleapp.DataProvider
 import ir.mohsenafshar.mysampleapp.data.DataSource
 import ir.mohsenafshar.mysampleapp.data.model.Waybill
-import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

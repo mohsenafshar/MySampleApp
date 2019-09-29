@@ -1,5 +1,7 @@
 package ir.mohsenafshar.mysampleapp
 
+import android.content.Context
+import androidx.multidex.MultiDex
 import com.facebook.stetho.Stetho
 
 import dagger.android.AndroidInjector
@@ -20,6 +22,11 @@ class MyApplication : DaggerApplication() {
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
         return DaggerAppComponent.factory().create(applicationContext)
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 
     //    @VisibleForTesting

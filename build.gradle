@@ -16,10 +16,17 @@ buildscript {
     repositories {
         google()
         jcenter()
+
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
         
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.google.gms:google-services:4.3.2'
+        classpath 'io.fabric.tools:gradle:1.31.1'  // Crashlytics plugin
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:1.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.navigationVersion"
         // NOTE: Do not place your application dependencies here; they belong
@@ -73,4 +80,13 @@ ext {
     rulesVersion = '1.0.1'
     timberVersion = '4.7.1'
     truthVersion = '0.44'
+}
+
+def getSignCredentials() {
+    def credsFilePath = file("credit.json").toString()
+    def credsFile = new File(credsFilePath, "").getText('UTF-8')
+    //noinspection UnnecessaryQualifiedReference
+    def json = new groovy.json.JsonSlurper().parseText(credsFile)
+
+    return json
 }
