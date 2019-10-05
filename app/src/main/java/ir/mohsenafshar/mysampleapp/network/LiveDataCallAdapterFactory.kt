@@ -1,7 +1,7 @@
 package ir.mohsenafshar.mysampleapp.network
 
 import androidx.lifecycle.LiveData
-import ir.mohsenafshar.mysampleapp.data.model.Response
+import ir.mohsenafshar.mysampleapp.data.model.MyResponse
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
@@ -25,6 +25,6 @@ class LiveDataCallAdapterFactory : CallAdapter.Factory() {
             throw IllegalArgumentException("resource must be parameterized")
         }
         val dataType = CallAdapter.Factory.getParameterUpperBound(0, observableType)    // Specified Parameter for ApiResponse<T> -> T
-        return LiveDataCallAdapter<Any>(Response::class.java)
+        return LiveDataCallAdapter(MyResponse::class.java, dataType)
     }
 }

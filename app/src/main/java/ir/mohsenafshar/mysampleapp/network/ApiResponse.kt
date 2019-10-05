@@ -1,16 +1,18 @@
 package ir.mohsenafshar.mysampleapp.network
 
+import ir.mohsenafshar.mysampleapp.data.model.MyResponse
 import retrofit2.Response
 import timber.log.Timber
+import java.lang.reflect.Type
 import java.util.regex.Pattern
 
 sealed class ApiResponse<T> {
     companion object {
-        fun <T> create(error: Throwable): ApiErrorResponse<T> {
+        fun create(error: Throwable): ApiErrorResponse {
             return ApiErrorResponse(error.message ?: "unknown error")
         }
 
-        fun <T> create(response: Response<T>): ApiResponse<T> {
+        fun create(response: Response<MyResponse>, dataType: Type): ApiResponse<MyResponse> {
             return if (response.isSuccessful) {
                 val body = response.body()
                 if (body == null || response.code() == 204) {
@@ -18,6 +20,7 @@ sealed class ApiResponse<T> {
                 } else {
                     ApiSuccessResponse(
                         body = body,
+                        dataType = dataType,
                         linkHeader = response.headers()?.get("link")
                     )
                 }
@@ -37,14 +40,16 @@ sealed class ApiResponse<T> {
 /**
  * separate class for HTTP 204 responses so that we can make ApiSuccessResponse's body non-null.
  */
-class ApiEmptyResponse<T> : ApiResponse<T>()
+class ApiEmptyResponse : ApiResponse<MyResponse>()
 
-data class ApiSuccessResponse<T>(
-    val body: T,
+data class ApiSuccessResponse(
+    val body: MyResponse,
+    val dataType: Type,
     val links: Map<String, String>
-) : ApiResponse<T>() {
-    constructor(body: T, linkHeader: String?) : this(
+) : ApiResponse<MyResponse>() {
+    constructor(body: MyResponse, dataType: Type, linkHeader: String?) : this(
         body = body,
+        dataType = dataType,
         links = linkHeader?.extractLinks() ?: emptyMap()
     )
 
@@ -85,4 +90,4 @@ data class ApiSuccessResponse<T>(
     }
 }
 
-data class ApiErrorResponse<T>(val errorMessage: String) : ApiResponse<T>()
+data class ApiErrorResponse(val errorMessage: String) : ApiResponse<MyResponse>()

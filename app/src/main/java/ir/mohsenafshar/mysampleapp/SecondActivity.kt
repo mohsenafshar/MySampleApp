@@ -4,22 +4,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import ir.mohsenafshar.mysampleapp.data.model.Command
 import ir.mohsenafshar.mysampleapp.data.model.DataResult
-import ir.mohsenafshar.mysampleapp.data.model.Response
-import ir.mohsenafshar.mysampleapp.data.model.User
+import ir.mohsenafshar.mysampleapp.data.model.MyResponse
 import ir.mohsenafshar.mysampleapp.data.remote.network.UserApi
 import ir.mohsenafshar.mysampleapp.network.ApiResponse
 import ir.mohsenafshar.mysampleapp.network.ApiSuccessResponse
 import ir.mohsenafshar.mysampleapp.network.LiveDataCallAdapterFactory
 import okhttp3.OkHttpClient
-import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
@@ -45,9 +41,11 @@ class SecondActivity : AppCompatActivity() {
 
         val userInfo = provideUserApi().getUserInfo()
         userInfo.observe(this, Observer {
-            val body = processResponse(it as ApiSuccessResponse<Response>)
+            val body = processResponse(it as ApiSuccessResponse)
             Timber.d(body.toString())
             result = body.data
+
+            val resultAsObject = getResultAsObject<DataResult>(it)
             //val dataResult = getResultAsObject(DataResult::class.java)
             //Timber.d("${dataResult?.user?.name} ${dataResult?.user?.phone}")
         })
@@ -62,19 +60,31 @@ class SecondActivity : AppCompatActivity() {
 
     }
 
+    fun <T> getResultAsObject(apiResponse: ApiSuccessResponse): T? {
+        try {
+            return GsonBuilder().create().fromJson(
+                GsonBuilder().create().toJson(processResponse(apiResponse).data),
+                apiResponse.dataType
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
     internal var result: Map<String, Any>? = null
 
-    protected open fun processResponse(response: ApiSuccessResponse<Response>) = response.body
+    protected open fun processResponse(response: ApiSuccessResponse) = response.body
 
     class DataHandler<T>(
-        private val apiResponse: ApiSuccessResponse<Response>,
-        private val resultLD: LiveData<ApiResponse<Response>>
+        private val apiResponse: ApiSuccessResponse,
+        private val resultLD: LiveData<ApiResponse<MyResponse>>
     ) {
 
         private val data = MediatorLiveData<T>()
         private val command = MediatorLiveData<Command>()
 
-        fun processResponse(response: ApiSuccessResponse<Response>) = response.body
+        fun processResponse(response: ApiSuccessResponse) = response.body
 
         fun getResultData() {
             data.addSource(resultLD) {

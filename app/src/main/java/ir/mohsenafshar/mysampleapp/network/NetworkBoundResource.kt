@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import ir.mohsenafshar.mysampleapp.data.model.MyResponse
 
 
 abstract class NetworkBoundResource<ResultType, RequestType>
@@ -80,10 +81,10 @@ abstract class NetworkBoundResource<ResultType, RequestType>
     fun asLiveData() = result as LiveData<Resource<ResultType>>
 
     @WorkerThread
-    protected open fun processResponse(response: ApiSuccessResponse<RequestType>) = response.body
+    protected open fun processResponse(response: ApiSuccessResponse) = response.body
 
     @WorkerThread
-    protected abstract fun saveCallResult(item: RequestType)
+    protected abstract fun saveCallResult(item: MyResponse)
 
     @MainThread
     protected abstract fun shouldFetch(data: ResultType?): Boolean
