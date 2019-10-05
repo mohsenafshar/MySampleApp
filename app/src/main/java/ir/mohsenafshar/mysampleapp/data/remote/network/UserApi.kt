@@ -9,11 +9,9 @@ import retrofit2.http.GET
 
 interface UserApi {
 
-    @GET("data")
+    @GET("dataa")
     fun getUserInfo() : LiveData<ApiResponse<DataResult>>
 
-    fun getUsersInfo() :
-            Call<MyResponse>
 
 
 }

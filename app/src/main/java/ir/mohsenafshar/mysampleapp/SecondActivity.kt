@@ -11,10 +11,9 @@ import com.google.gson.GsonBuilder
 import ir.mohsenafshar.mysampleapp.data.model.Command
 import ir.mohsenafshar.mysampleapp.data.model.DataResult
 import ir.mohsenafshar.mysampleapp.data.model.MyResponse
+import ir.mohsenafshar.mysampleapp.data.model.User
 import ir.mohsenafshar.mysampleapp.data.remote.network.UserApi
-import ir.mohsenafshar.mysampleapp.network.ApiResponse
-import ir.mohsenafshar.mysampleapp.network.ApiSuccessResponse
-import ir.mohsenafshar.mysampleapp.network.LiveDataCallAdapterFactory
+import ir.mohsenafshar.mysampleapp.network.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,24 +38,27 @@ class SecondActivity : AppCompatActivity() {
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
 
-        val userInfo = provideUserApi().getUserInfo()
-        userInfo.observe(this, Observer {
-            val body = processResponse(it as ApiSuccessResponse)
-            Timber.d(body.toString())
-            result = body.data
+//        val userInfo = provideUserApi().getUserInfo()
+//        userInfo.observe(this, Observer {
+//            val body = processResponse(it as ApiSuccessResponse)
+//            Timber.d(body.toString())
+//            result = body.data
+//
+//            val resultAsObject = getResultAsObject<DataResult>(it)
+//        })
 
-            val resultAsObject = getResultAsObject<DataResult>(it)
-            //val dataResult = getResultAsObject(DataResult::class.java)
-            //Timber.d("${dataResult?.user?.name} ${dataResult?.user?.phone}")
+        UserRepos().getUser().observe(this, Observer {
+            when {
+                it.status == Status.SUCCESS  -> {
+                    Timber.d(it.data.toString())
+                }
+
+                it.status == Status.ERROR  -> {
+                    Timber.d(it.message)
+                }
+            }
         })
 
-//        data.addSource(userInfo) {
-//            data.value = (it as ApiSuccessResponse).body.data
-//        }
-//
-//        command.addSource(userInfo) {
-//            command.value = (it as ApiSuccessResponse).body.command
-//        }
 
     }
 
@@ -84,13 +86,13 @@ class SecondActivity : AppCompatActivity() {
         private val data = MediatorLiveData<T>()
         private val command = MediatorLiveData<Command>()
 
-        fun processResponse(response: ApiSuccessResponse) = response.body
-
         fun getResultData() {
             data.addSource(resultLD) {
                // data.value = getResultAsObject(DataResult::class.java)
             }
         }
+
+        fun processResponse(response: ApiSuccessResponse) = response.body
 
         val bodyType = getParameterUpperBound(0, apiResponse as ParameterizedType)
 
@@ -161,18 +163,81 @@ class SecondActivity : AppCompatActivity() {
         }
 
     }
+}
 
-    fun provideUserApi(): UserApi {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(
-                OkHttpClient.Builder()
-                    .addNetworkInterceptor(StethoInterceptor())
-                    .build()
-            )
-            .addCallAdapterFactory(LiveDataCallAdapterFactory())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(UserApi::class.java)
+class UserRepos {
+
+    private val result = MediatorLiveData<Resource<DataResult>>()
+
+    fun getUser() : LiveData<Resource<DataResult>> {
+        return object : ResultHandler<DataResult>() {
+
+            override fun createCall(): LiveData<ApiResponse<DataResult>> {
+                return provideUserApi().getUserInfo()
+            }
+
+        }.asLiveData()
     }
+
+}
+
+abstract class ResultHandler<T> {
+
+    private val result = MediatorLiveData<Resource<T>>()
+
+    init {
+        fetchFromNetwork()
+    }
+
+    fun fetchFromNetwork() {
+        val responseLiveData: LiveData<ApiResponse<T>> = createCall()
+
+        result.addSource(responseLiveData) {
+            when(it) {
+                is ApiSuccessResponse -> {
+                    result.value = Resource.success(it.body.command, getResultAsObject<T>(it))
+                }
+
+                is ApiErrorResponse -> {
+                    result.value = Resource.error(it.errorMessage, null)
+                }
+
+                is ApiEmptyResponse -> {
+                    // load anything stored in database
+                }
+            }
+
+
+        }
+    }
+
+    fun asLiveData() = result as LiveData<Resource<T>>
+    fun processResponse(response: ApiSuccessResponse) = response.body
+    fun <T> getResultAsObject(apiResponse : ApiSuccessResponse): T? {
+        try {
+            return GsonBuilder().create().fromJson(
+                GsonBuilder().create().toJson(processResponse(apiResponse).data),
+                apiResponse.dataType
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    abstract fun createCall() : LiveData<ApiResponse<T>>
+}
+
+fun provideUserApi(): UserApi {
+    return Retrofit.Builder()
+        .baseUrl("http://mohsenafshar.ir/")
+        .client(
+            OkHttpClient.Builder()
+                .addNetworkInterceptor(StethoInterceptor())
+                .build()
+        )
+        .addCallAdapterFactory(LiveDataCallAdapterFactory())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(UserApi::class.java)
 }
